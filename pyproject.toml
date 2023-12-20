@@ -1,0 +1,17 @@
+[project]
+name = "athena-code-creator"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Dylan Evans", email = "dylan@dje.me"},
+]
+dependencies = [
+    "openapi>=1.1.0",
+]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+package-type = "application"
