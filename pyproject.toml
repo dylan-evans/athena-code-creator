@@ -8,8 +8,6 @@ authors = [
 dependencies = [
     "openai>=1.6.0",
     "click>=8.1.7",
-    "progress>=1.6",
-    "print-color>=0.4.6",
     "rich>=13.7.0",
 ]
 requires-python = "==3.11.*"
@@ -17,7 +15,7 @@ readme = "README.md"
 license = {text = "MIT"}
 
 [project.scripts]
-acc = "athena_code_creator.main:main"
+acc = "athena_code_creator.cli.cli:cli"
 
 [tool.pdm]
 package-type = "application"

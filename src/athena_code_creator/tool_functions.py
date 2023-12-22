@@ -127,3 +127,11 @@ class GitCommandFunction(BaseFunction):
             return {'success': True, 'output': proc.stdout}
         else:
             return {'success': False, 'error': proc.stderr}
+
+
+DEFAULT_FUNCTIONS = [
+    ReadFileFunction,
+    WriteFileFunction,
+    ExecFunction,
+    GitCommandFunction,
+]

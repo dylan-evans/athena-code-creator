@@ -15,7 +15,7 @@ from openai.types.beta.threads.run_submit_tool_outputs_params import RunSubmitTo
 from openai.types.beta.threads.required_action_function_tool_call import RequiredActionFunctionToolCall, Function
 from openai.types.beta.threads.thread_message import ThreadMessage
 
-from athena_code_creator.tool_functions import BaseFunction, WriteFileFunction, ReadFileFunction, ExecFunction
+from athena_code_creator.tool_functions import BaseFunction, WriteFileFunction, ReadFileFunction, ExecFunction, GitCommandFunction
 from athena_code_creator.config import AthenaConfig
 from .assistant import AssistantInterface
 
@@ -90,7 +90,7 @@ def send_cmd(console, thread, line):
 def setup_athena() -> AssistantInterface:
     # Use OPENAI_API_KEY environment var
     client = openai.OpenAI()
-    functions = [WriteFileFunction, ReadFileFunction, ExecFunction]
+    functions = [WriteFileFunction, ReadFileFunction, ExecFunction, GitCommandFunction]
     config, config_exists = AthenaConfig.load_config_or_get_defaults(ACC_CONFIG)
     if config_exists:
         acc = AssistantInterface.retrieve(client, config.assistant_id, functions)
@@ -116,6 +116,6 @@ def create_athena(client: openai.OpenAI, functions: list[BaseFunction]):
             * Output will be printed to the terminal as markdown via the python library "rich".
         """,
         "tools": [{"type": "code_interpreter"}] + [{"type": "function", "function": func.get_function()} for func in functions],
-#        "model": "gpt-3.5-turbo-1106",
-        "model": "gpt-4-1106-preview",
+        "model": "gpt-3.5-turbo-1106",
+#        "model": "gpt-4-1106-preview",
     })

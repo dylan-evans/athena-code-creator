@@ -1,6 +1,22 @@
 import os
+from pathlib import Path
 
 import pydantic
+
+USER_CONFIG = Path("~/.config/athena-code-creator/config.json").expanduser()
+
+
+def load_user_config(path: Path = USER_CONFIG) -> "UserConfig":
+    try:
+        return UserConfig.model_validate_json(path.read_text())
+    except IOError:
+        return UserConfig()
+
+
+def save_user_config(config: "UserConfig", path: Path = USER_CONFIG):
+    if not path.parent.exists():
+        path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(config.model_dump_json())
 
 
 class AthenaConfig(pydantic.BaseModel):
@@ -18,3 +34,11 @@ class AthenaConfig(pydantic.BaseModel):
         with open(filename, "w") as dst:
             dst.write(self.model_dump_json())
 
+
+class UserConfig(pydantic.BaseModel):
+    selected_assistant_id: str | None = None
+    selected_thread_id: str | None = None
+    selected_run_id: str | None = None
+
+    def save(self):
+        save_user_config(self)
