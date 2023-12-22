@@ -2,7 +2,7 @@ import json
 import re
 import subprocess
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, List
 from abc import ABC
 from logging import exception
 
@@ -109,3 +109,21 @@ class ReadFileFunction(BaseFunction):
                 "success": False,
                 "error": "Unable to access file"
             })
+
+
+class GitCommandFunction(BaseFunction):
+    NAME: ClassVar[str] = "git_command"
+    DESCRIPTION: ClassVar[str] = "Execute a Git command within a repository."
+    command: str
+    args: List[str] = []
+    repo_dir: str
+
+    def __call__(self, events: FunctionEventHandler = FunctionEventHandler()):
+        git_cmd = ["git", "-C", self.repo_dir] + [self.command] + self.args
+        command_str = " ".join(git_cmd)
+        events.log(f"Executing Git command: {command_str}")
+        proc = subprocess.run(git_cmd, capture_output=True, text=True)
+        if proc.returncode == 0:
+            return {'success': True, 'output': proc.stdout}
+        else:
+            return {'success': False, 'error': proc.stderr}
