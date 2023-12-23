@@ -9,6 +9,7 @@ from rich.prompt import Prompt
 from rich.panel import Panel
 from rich.markdown import Markdown
 
+from .chat import ChatView
 from ..assistant import AssistantInterface
 from ..config import UserConfig, load_user_config, save_user_config
 from ..tool_functions import DEFAULT_FUNCTIONS
@@ -68,7 +69,4 @@ def send_cmd(console, thread, line):
             time.sleep(0.2)
         resp = op.get_response()
 
-    for content in resp.content:
-        if content.type == "text":
-            console.print(Panel(Markdown(content.text.value), title=f"GPT", style="white on color(237)"))
-
+    ChatView(console).show_assistant_message(resp)

@@ -1,17 +1,17 @@
 import rich
 import rich.box
 from rich.console import Console
-from rich.table import Table
+from rich.table import Table, Column
 from rich.emoji import Emoji
 import click
-from openai.types.beta.assistant import Assistant
 
+from ..oa import Assistant
 from .cli import cli, CLI
 from ..tool_functions import DEFAULT_FUNCTIONS
 
-
 def show_assistant(console: Console, assistant: Assistant):
     console.print(f"Name = {assistant.name}, ID = {assistant.id}")
+
 
 @cli.group(invoke_without_command=True)
 @click.pass_context
@@ -28,6 +28,7 @@ def list_assistants(obj: CLI):
         "Name",
         "ID",
         "Model",
+        Column("Instructions", no_wrap=True),
         title="Assistants",
         box=rich.box.SIMPLE_HEAD
     )
@@ -40,6 +41,7 @@ def list_assistants(obj: CLI):
                 item.name,
                 item.id,
                 item.model,
+                item.instructions.split("\n")[0].strip(),
                 style="bold green" if selected else "",
             )
     obj.console.print(table)
@@ -53,6 +55,7 @@ def delete(obj: CLI, assistant_id):
         for id in assistant_id:
             obj.console.print(f"Deleting assistant [bold]{id}[/bold].")
             obj.openai.beta.assistants.delete(assistant_id=id)
+
 
 @assistant.command
 @click.pass_obj
@@ -74,14 +77,14 @@ def select(obj: CLI, assistant_id: str, name: bool):
 @click.argument("model")
 @click.argument("name")
 @click.argument("instructions")
-@click.option("--select", "-S", is_flag=True)
+@click.option("--select", "-s", is_flag=True)
 def create(obj: CLI, model, name, instructions, select):
     with obj.console.status("Working..."):
         assist = obj.openai.beta.assistants.create(
             model=model,
             name=name,
             instructions=instructions,
-            tools=[{"type": "code_interpreter"}] + [{"type": "function", "function": func.get_function()} for func in functions],
+            tools=[{"type": "code_interpreter"}] + [{"type": "function", "function": func.get_function()} for func in DEFAULT_FUNCTIONS],
         )
     obj.console.print("Created: ")
     show_assistant(obj.console, assist)
